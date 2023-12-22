@@ -65,7 +65,8 @@ class Dev(commands.Cog):
         **Connected Users:** {len(self.bot.users)}
         **Loaded Emojis:** {len(self.bot.emojis)}
         **Loaded Commands:** {len(self.bot.commands)}
-        **Loaded Cogs:** {len(self.bot.cogs)}"""
+        **Loaded Cogs:** {len(self.bot.cogs)}
+        **Loaded Commands:** {len(self.bot.commands)}, `{', '.join([command.name for command in self.bot.commands])}`"""
 
         await ctx.reply(message)
 

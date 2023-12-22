@@ -1,3 +1,4 @@
+import io
 import discord
 import pyshorteners
 from discord.ext import commands
@@ -112,6 +113,29 @@ class Utils(commands.Cog):
     async def shorten(self, ctx, url):
         s = pyshorteners.Shortener()
         await ctx.reply(s.tinyurl.short(url))
+
+    @commands.command(name='help', help='Shows this message')
+    async def help(self, ctx):
+        await ctx.reply("[Help Page](<https://github.com/LapisPhoenix/KeiretsuV2/wiki/Documentation>)")
+
+    @commands.command(name='generate_markdown', help='Generates markdown documentation for the bot')
+    async def generate_markdown(self, ctx):
+        message = "# Keiretsu V2 Documentation\n\n"
+
+        for cog in self.bot.cogs:
+            cog = self.bot.get_cog(cog)
+            message += f"## {cog.qualified_name}\n\n---\n\n"
+
+            for command in cog.get_commands():
+                message += f"### {command.name}\n"
+                message += f"**Description:** {command.help}\n <br>"
+                message += f"**Usage:** {command.usage}\n <br>"
+                message += f"**Aliases:** {command.aliases}\n"
+                message += "\n"
+
+            message += "\n---\n\n"
+
+        await ctx.reply(file=discord.File(fp=io.StringIO(message), filename='KeiretsuV2.md'))
 
 
 async def setup(bot):

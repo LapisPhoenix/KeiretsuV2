@@ -22,7 +22,6 @@ Keiretsu V2 is a Discord self-bot developed in Python using the discord.py-self 
 
 ## Cogs
 
-- `dev.py`: Commands for managing cogs.
 - `fun.py`: Fun commands like 8ball, coinflip, and dice roll.
 - `utils.py`: Utility commands for retrieving information about guilds, users, channels, roles, and emojis, as well as a URL shortening command.
 

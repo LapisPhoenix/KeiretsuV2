@@ -8,7 +8,8 @@ from colorama import init, Fore
 
 
 bot = commands.Bot(command_prefix='!', self_bot=True)   # ! is a placeholder, on ready it will be replaced with the prefix from config file
-bot.__version__ = '1.0.0'
+bot.remove_command('help')
+bot.__version__ = '1.0.1'
 
 
 def inital_window_setup():
@@ -75,4 +76,5 @@ async def on_ready():
 
 if __name__ == '__main__':
     load_dotenv()
-    bot.run(os.environ.get('TOKEN'))
+    print('Booting Up...')
+    bot.run(os.environ.get('TOKEN'), log_level=0)   # 0 = no debug, 1 = debug
