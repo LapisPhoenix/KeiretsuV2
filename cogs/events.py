@@ -91,26 +91,26 @@ class Events(commands.Cog):
             except Exception as e:
                 print(f'[{Fore.RED}NITRO SNIPER{Fore.RESET}] Failed to redeem nitro code: {code} ({e})')
 
-        with open("channels.txt", "r") as f:
-            channels = f.read().splitlines()
-            if after.channel.id in channels:
-                message = f"**Message edited in {after.channel.mention}**\n" \
-                          f"**Before:** `{before.content}`\n" \
-                          f"**After:** `{after.content}`\n" \
-                          f"**Author:** {after.author.mention}"
+        # with open("channels.txt", "r") as f:
+        #     channels = f.read().splitlines()
+        #     if after.channel.id in channels:
+        #         message = f"**Message edited in {after.channel.mention}**\n" \
+        #                   f"**Before:** `{before.content}`\n" \
+        #                   f"**After:** `{after.content}`\n" \
+        #                   f"**Author:** {after.author.mention}"
+#
+        #         await self.log_channel.send(message)
 
-                await self.log_channel.send(message)
-
-    @commands.Cog.listener()
-    async def on_message_delete(self, message):
-        with open("channels.txt", "r") as f:
-            channels = f.read().splitlines()
-            if message.channel.id in channels:
-                message = f"**Message deleted in {message.channel.mention}**\n" \
-                          f"**Content:** `{message.content}`\n" \
-                          f"**Author:** {message.author.mention}"
-
-                await self.log_channel.send(message)
+    # @commands.Cog.listener()
+    # async def on_message_delete(self, message):
+    #     with open("channels.txt", "r") as f:
+    #         channels = f.read().splitlines()
+    #         if message.channel.id in channels:
+    #             message = f"**Message deleted in {message.channel.mention}**\n" \
+    #                       f"**Content:** `{message.content}`\n" \
+    #                       f"**Author:** {message.author.mention}"
+#
+    #             await self.log_channel.send(message)
 
 
 async def setup(bot):
