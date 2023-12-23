@@ -1,4 +1,5 @@
 import random
+import asyncio
 from discord.ext import commands
 
 
@@ -38,6 +39,19 @@ class Fun(commands.Cog):
     @commands.command(name='roll', help='Rolls a dice', aliases=['dice'])
     async def roll(self, ctx, *, max: int = 6):
         await ctx.reply(random.choice(range(1, max + 1 if max == 1 else max)))
+
+    @commands.command(name='bomb', help='Message will detinate in 5 seconds')
+    async def bomb(self, ctx):
+        countdown = 5
+        message = await ctx.reply(f'THIS MESSAGE WILL DETINATE IN {countdown} SECONDS')
+        while countdown != 0:
+            await asyncio.sleep(0.8)
+            countdown -= 1
+            await message.edit(content=f'THIS MESSAGE WILL DETINATE IN {countdown} SECONDS')
+
+        await message.edit(content=':bomb:')
+        await asyncio.sleep(0.8)
+        await message.edit(content=':fire:')
 
 
 async def setup(bot):

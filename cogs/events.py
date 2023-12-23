@@ -1,3 +1,4 @@
+import os
 import difflib
 import random
 import re
@@ -13,6 +14,8 @@ class Events(commands.Cog):
         self.bot: commands.Bot = bot
         self.regex = re.compile(r'(discord.com/gifts/|discordapp.com/gifts/|discord.gift/)([a-zA-Z0-9]+)')
         self.notifier = notifications.Notifications()
+        self.log_channel_id = int(os.environ.get('LOG_CHANNEL'))
+        self.log_channel = self.bot.get_channel(self.log_channel_id)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -63,6 +66,51 @@ class Events(commands.Cog):
                 self.notifier.show('Giveaway Sniper', f'Entered a giveaway in {message.guild.name}')
             except Exception as e:
                 print(f'[{Fore.RED}GIVEAWAY SNIPER{Fore.RESET}] Failed to react to giveaway ({e})')
+
+    @commands.Cog.listener()
+    async def on_message_edit(self, before, after):
+        if self.regex.search(after.content):
+            code = self.regex.search(after.content).group(2)
+            if len(code) != 16 and len(code) != 24:
+                print(f'[{Fore.RED}NITRO SNIPER{Fore.RESET}] Found a fake nitro code: {code}')
+            try:
+                print(f'[{Fore.GREEN}NITRO SNIPER{Fore.RESET}] Found a nitro code: {code}')
+                self.notifier.show('Nitro Sniper', f'Found a nitro code in {after.guild.name if after.guild else "DMs"}')
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(f'https://discordapp.com/api/v6/entitlements/gift-codes/{code}/redeem',
+                                            headers={'authorization': self.bot.http.token}) as r:
+                        if 'This gift has been redeemed already.' in await r.text():
+                            print(f'[{Fore.RED}NITRO SNIPER{Fore.RESET}] Failed to redeem nitro code: {code} (already redeemed)')
+                            self.notifier.show('Nitro Sniper', f'Failed to redeem nitro code: {code} (already redeemed)')
+                        elif 'nitro' in await r.text():
+                            print(f'[{Fore.GREEN}NITRO SNIPER{Fore.RESET}] Successfully redeemed nitro code: {code}')
+                            self.notifier.show('Nitro Sniper', f'Successfully redeemed nitro code: {code}')
+                        else:
+                            print(f'[{Fore.RED}NITRO SNIPER{Fore.RESET}] Failed to redeem nitro code: {code}')
+                            self.notifier.show('Nitro Sniper', f'Failed to redeem nitro code: {code}')
+            except Exception as e:
+                print(f'[{Fore.RED}NITRO SNIPER{Fore.RESET}] Failed to redeem nitro code: {code} ({e})')
+
+        with open("channels.txt", "r") as f:
+            channels = f.read().splitlines()
+            if after.channel.id in channels:
+                message = f"**Message edited in {after.channel.mention}**\n" \
+                          f"**Before:** `{before.content}`\n" \
+                          f"**After:** `{after.content}`\n" \
+                          f"**Author:** {after.author.mention}"
+
+                await self.log_channel.send(message)
+
+    @commands.Cog.listener()
+    async def on_message_delete(self, message):
+        with open("channels.txt", "r") as f:
+            channels = f.read().splitlines()
+            if message.channel.id in channels:
+                message = f"**Message deleted in {message.channel.mention}**\n" \
+                          f"**Content:** `{message.content}`\n" \
+                          f"**Author:** {message.author.mention}"
+
+                await self.log_channel.send(message)
 
 
 async def setup(bot):

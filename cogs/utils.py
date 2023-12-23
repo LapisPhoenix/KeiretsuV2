@@ -1,12 +1,15 @@
 import io
 import discord
+import datetime
 import pyshorteners
 from discord.ext import commands
+from ext import notifications
 
 
 class Utils(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
+        self.notifier = notifications.Notifications()
 
     @commands.command(name='guildinfo', help='Shows debug info about the guild')
     async def guildinfo(self, ctx, guild: discord.Guild = None):
@@ -141,7 +144,48 @@ class Utils(commands.Cog):
     async def uptime(self, ctx):
         uptime = datetime.datetime.now() - self.bot.boot_time
         uptime = str(uptime).split('.')[0]
-        await ctx.reply(f'Uptime: {uptime}')
+        boot_time = self.bot.boot_time.strftime('%d/%m/%Y %H:%M:%S')
+        await ctx.reply(f'Uptime: {uptime} ({boot_time})')
+
+    @commands.command(name='download', help='Links to the github repo')
+    async def download(self, ctx):
+        await ctx.reply('https://github.com/LapisPhoenix/KeiretsuV2')
+
+    @commands.command(name='watch', help='Whitelists a channel for logging')
+    async def watch(self, ctx, channel: discord.TextChannel = None):
+        await ctx.message.delete()
+        if channel is None:
+            self.notifier.show('Keiretsu V2', 'Please specify a channel')
+            return
+
+        with open("whitelist.txt", "a") as f:
+            channels = f.read().splitlines()
+            if channel.id in channels:
+                self.notifier.show('Keiretsu V2', 'Channel is already whitelisted')
+                return
+
+            f.write(f"{channel.id}\n")
+            self.notifier.show('Keiretsu V2', f"Whitelisted {channel.mention}")
+
+    @commands.command(name='unwatch', help='Unwhitelists a channel for logging')
+    async def unwatch(self, ctx, channel: discord.TextChannel = None):
+        await ctx.message.delete()
+        if channel is None:
+            self.notifier.show('Keiretsu V2', 'Please specify a channel')
+            return
+
+        with open("whitelist.txt", "r") as f:
+            channels = f.read().splitlines()
+            if channel.id not in channels:
+                self.notifier.show('Keiretsu V2', 'Channel is not whitelisted')
+                return
+
+        with open("whitelist.txt", "w") as f:
+            for line in channels:
+                if line != channel.id:
+                    f.write(f"{line}\n")
+
+        self.notifier.show('Keiretsu V2', f"Unwhitelisted {channel.mention}")
 
 
 async def setup(bot):
