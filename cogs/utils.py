@@ -137,6 +137,12 @@ class Utils(commands.Cog):
 
         await ctx.reply(file=discord.File(fp=io.StringIO(message), filename='KeiretsuV2.md'))
 
+    @commands.command(name='uptime', help='Shows the bot\'s uptime')
+    async def uptime(self, ctx):
+        uptime = datetime.datetime.now() - self.bot.boot_time
+        uptime = str(uptime).split('.')[0]
+        await ctx.reply(f'Uptime: {uptime}')
+
 
 async def setup(bot):
     await bot.add_cog(Utils(bot))

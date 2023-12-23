@@ -1,4 +1,5 @@
 import sys
+import datetime
 from discord.ext import commands
 
 
@@ -56,6 +57,8 @@ class Dev(commands.Cog):
 
     @commands.command(name='botdebug', help='Shows debug info about the bot')
     async def botdebug(self, ctx):
+        uptime = datetime.datetime.now() - self.bot.boot_time
+        uptime = str(uptime).split('.')[0]
         message = f""">>> **Bot Debug**
         **Bot**: Keiretsu V2 - By Lapis Pheonix
         **Bot Version:** {self.bot.__version__}
@@ -66,7 +69,8 @@ class Dev(commands.Cog):
         **Loaded Emojis:** {len(self.bot.emojis)}
         **Loaded Commands:** {len(self.bot.commands)}
         **Loaded Cogs:** {len(self.bot.cogs)}
-        **Loaded Commands:** {len(self.bot.commands)}, `{', '.join([command.name for command in self.bot.commands])}`"""
+        **Loaded Commands:** {len(self.bot.commands)}, `{', '.join([command.name for command in self.bot.commands])}`
+        **Bot Uptime:** {uptime}"""
 
         await ctx.reply(message)
 

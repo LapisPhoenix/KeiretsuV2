@@ -1,5 +1,6 @@
 import os
 import sys
+import datetime
 from pathlib import Path
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -9,7 +10,7 @@ from colorama import init, Fore
 
 bot = commands.Bot(command_prefix='!', self_bot=True)   # ! is a placeholder, on ready it will be replaced with the prefix from config file
 bot.remove_command('help')
-bot.__version__ = '1.1.1'
+bot.__version__ = '1.1.2'
 
 
 def inital_window_setup():
@@ -68,6 +69,7 @@ async def on_ready():
 @@@@                 @@@@"""))
     prefix = os.environ.get('PREFIX')
     bot.command_prefix = prefix
+    bot.boot_time = datetime.datetime.now()
     print(f'Logged in as {Fore.GREEN}{bot.user.name}{Fore.RESET}')
     print(f'Connected to {Fore.GREEN}{len(bot.guilds)}{Fore.RESET} guilds')
     print(f'Loaded {Fore.GREEN}{len(bot.commands)}{Fore.RESET} commands')

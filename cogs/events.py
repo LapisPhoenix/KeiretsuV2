@@ -1,5 +1,4 @@
 import difflib
-import json
 import random
 import re
 import aiohttp
