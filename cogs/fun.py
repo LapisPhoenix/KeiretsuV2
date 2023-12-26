@@ -7,7 +7,8 @@ class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
-    def load_animation(self, path) -> tuple[list[str], int | float]:
+    @staticmethod
+    def load_animation(path) -> tuple[list[str], int | float]:
         with open(path, 'r') as f:
             f.seek(0)
             duration = float(f.readline())
@@ -61,14 +62,6 @@ class Fun(commands.Cog):
         await message.edit(content=':bomb:')
         await asyncio.sleep(0.8)
         await message.edit(content=':fire:')
-
-    @commands.command(name='rayhero', help='Rayhero')
-    async def rayhero(self, ctx):
-        frames, duration = self.load_animation('anims/rayhero.txt')
-        message = await ctx.reply(frames[0])
-        for frame in frames:
-            await asyncio.sleep(duration)
-            await message.edit(content=frame)
 
 
 async def setup(bot):
