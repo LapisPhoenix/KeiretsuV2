@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 import datetime
 from pathlib import Path
 from discord.ext import commands
@@ -10,7 +11,7 @@ from colorama import init, Fore
 
 bot = commands.Bot(command_prefix='!', self_bot=True)   # ! is a placeholder, on ready it will be replaced with the prefix from config file
 bot.remove_command('help')
-bot.__version__ = '1.2.0'
+bot.__version__ = '1.2.1'
 
 
 def inital_window_setup():
@@ -80,4 +81,7 @@ if __name__ == '__main__':
     load_dotenv()
     print('Booting Up...')
     print('Reminder: You may be prompted to login your spotify account, this is normal')
-    bot.run(os.environ.get('TOKEN'), log_level=0)   # 0 = no debug, 1 = debug
+    if os.environ.get('DEV') == 'true':
+        print('Running in development mode')
+        bot.run(os.environ.get('TOKEN'))
+    bot.run(os.environ.get('TOKEN'), log_level=0)

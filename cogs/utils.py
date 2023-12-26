@@ -7,6 +7,8 @@ import pyshorteners
 import spotipy
 from discord.ext import commands
 from spotipy.oauth2 import SpotifyClientCredentials
+from pytube import YouTube
+from pytube.exceptions import RegexMatchError, AgeRestrictedError
 from ext import notifications
 
 
@@ -648,6 +650,65 @@ class Utils(commands.Cog):
 
         await ctx.reply(file=discord.File(fp=io.StringIO(message), filename='loripsum.txt'))
 
+    @commands.command(name='yt2mp4', help='Converts a YouTube video to mp4')
+    async def yt2mp4(self, ctx, url: str):
+        try:
+            message = await ctx.reply('Finding video...')
+            loop = self.bot.loop
+            yt = await loop.run_in_executor(None, lambda: YouTube(url))
+            stream = yt.streams.get_highest_resolution()
+
+            await message.edit(content='Found Video, Downloading...')
+            file = await loop.run_in_executor(None, stream.download)
+
+            await message.edit(content='Downloaded, Uploading...')
+
+            max_file_size = 100_000_000 if self.bot.user.premium else 25_000_000
+
+            if os.path.getsize(file) > max_file_size:
+                await message.edit(content=f'File too large to upload, here is a link instead. [Download]({stream.url})')
+            else:
+                await ctx.send(
+                    content=f"Here is your content! [Direct Download]({stream.url})",
+                    file=discord.File(fp=file, filename=f'{yt.title}.mp4')
+                )
+
+            os.remove(file)  # Clean up
+
+        except AgeRestrictedError:
+            await ctx.reply('This video is age restricted, I cannot download it!')
+        except RegexMatchError:
+            await ctx.reply('Invalid URL')
+
+    @commands.command(name='yt2mp3', help='Converts a YouTube video to mp3')
+    async def yt2mp3(self, ctx, url: str):
+        try:
+            message = await ctx.reply('Finding video...')
+            loop = self.bot.loop
+            yt = await loop.run_in_executor(None, lambda: YouTube(url))
+            stream = yt.streams.get_audio_only()
+
+            await message.edit(content='Found Video, Downloading...')
+            file = await loop.run_in_executor(None, stream.download)
+
+            await message.edit(content='Downloaded, Uploading...')
+
+            max_file_size = 100_000_000 if self.bot.user.premium else 25_000_000
+
+            if os.path.getsize(file) > max_file_size:
+                await message.edit(content=f'File too large to upload, here is a link instead. [Download]({stream.url})')
+            else:
+                await ctx.send(
+                    content=f"Here is your content! [Direct Download]({stream.url})",
+                    file=discord.File(fp=file, filename=f'{yt.title}.mp3')
+                )
+
+            os.remove(file)  # Clean up
+
+        except AgeRestrictedError:
+            await ctx.reply('This video is age restricted, I cannot download it!')
+        except RegexMatchError:
+            await ctx.reply('Invalid URL')
 
 
 async def setup(bot):

@@ -12,7 +12,7 @@ class Notifications:
     def show(self, title, message):
         if platform.system() == 'Windows':
             toaster = win10toast.ToastNotifier()
-            toaster.show_toast(title, message, icon_path='keiretsu_v2.ico', duration=5)
+            toaster.show_toast(title, message, icon_path='./assets/keiretsu_v2.ico', duration=5)
         elif platform.system() == 'Linux' and DESKTOP_NOTIFY_INSTALLED:
-            notify = Notify(summary=title, body=message, icon='keiretsu_v2.ico', timeout=5)
+            notify = Notify(summary=title, body=message, icon='./assets/keiretsu_v2.ico', timeout=5)
             notify.show()
