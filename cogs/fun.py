@@ -7,6 +7,15 @@ class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
+    def load_animation(self, path) -> tuple[list[str], int | float]:
+        with open(path, 'r') as f:
+            f.seek(0)
+            duration = float(f.readline())
+            frames = f.read().split('---')
+            frames[0] = frames[0][3:]
+
+        return frames, duration
+
     @commands.command(name='8ball', help='Ask the magic 8ball a question')
     async def eightball(self, ctx, *, question):
         responses = ['It is certain.',
@@ -52,6 +61,14 @@ class Fun(commands.Cog):
         await message.edit(content=':bomb:')
         await asyncio.sleep(0.8)
         await message.edit(content=':fire:')
+
+    @commands.command(name='rayhero', help='Rayhero')
+    async def rayhero(self, ctx):
+        frames, duration = self.load_animation('anims/rayhero.txt')
+        message = await ctx.reply(frames[0])
+        for frame in frames:
+            await asyncio.sleep(duration)
+            await message.edit(content=frame)
 
 
 async def setup(bot):

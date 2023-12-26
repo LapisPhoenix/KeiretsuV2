@@ -10,7 +10,7 @@ from colorama import init, Fore
 
 bot = commands.Bot(command_prefix='!', self_bot=True)   # ! is a placeholder, on ready it will be replaced with the prefix from config file
 bot.remove_command('help')
-bot.__version__ = '1.1.3'
+bot.__version__ = '1.1.4'
 
 
 def inital_window_setup():
@@ -79,4 +79,5 @@ async def on_ready():
 if __name__ == '__main__':
     load_dotenv()
     print('Booting Up...')
+    print('Reminder: You may be prompted to login your spotify account, this is normal')
     bot.run(os.environ.get('TOKEN'), log_level=0)   # 0 = no debug, 1 = debug

@@ -91,26 +91,27 @@ class Events(commands.Cog):
             except Exception as e:
                 print(f'[{Fore.RED}NITRO SNIPER{Fore.RESET}] Failed to redeem nitro code: {code} ({e})')
 
-        # with open("channels.txt", "r") as f:
-        #     channels = f.read().splitlines()
-        #     if after.channel.id in channels:
-        #         message = f"**Message edited in {after.channel.mention}**\n" \
-        #                   f"**Before:** `{before.content}`\n" \
-        #                   f"**After:** `{after.content}`\n" \
-        #                   f"**Author:** {after.author.mention}"
-#
-        #         await self.log_channel.send(message)
+        with open("channels.txt", "r") as f:
+            channels = f.read().splitlines()
+            if after.channel.id in channels:
+                message = f"Message edited in {after.channel.id} ({after.channel.name})\n" \
+                          f"Before: `{before.content}`\n" \
+                          f"After: `{after.content}`\n" \
+                          f"Author: {after.author.id} ({after.author.name})\n\n"
+                with open("logs.txt", "a") as f:
+                    f.write(message)
 
-    # @commands.Cog.listener()
-    # async def on_message_delete(self, message):
-    #     with open("channels.txt", "r") as f:
-    #         channels = f.read().splitlines()
-    #         if message.channel.id in channels:
-    #             message = f"**Message deleted in {message.channel.mention}**\n" \
-    #                       f"**Content:** `{message.content}`\n" \
-    #                       f"**Author:** {message.author.mention}"
-#
-    #             await self.log_channel.send(message)
+    @commands.Cog.listener()
+    async def on_message_delete(self, message):
+        with open("channels.txt", "r") as f:
+            channels = f.read().splitlines()
+            if message.channel.id in channels:
+                message = f"Message deleted in {message.channel.id} ({message.channel.name})\n" \
+                          f"Content: `{message.content}`\n" \
+                          f"Author: {message.author.id} ({message.author.name})\n\n"
+
+                with open("logs.txt", "a") as f:
+                    f.write(message)
 
 
 async def setup(bot):

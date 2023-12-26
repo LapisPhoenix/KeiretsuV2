@@ -1,8 +1,12 @@
 import io
+import random
+import os
 import discord
 import datetime
 import pyshorteners
+import spotipy
 from discord.ext import commands
+from spotipy.oauth2 import SpotifyClientCredentials
 from ext import notifications
 
 
@@ -10,6 +14,13 @@ class Utils(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.notifier = notifications.Notifications()
+        client_id = os.environ.get('SPOTIFY_CLID')
+        client_secret = os.environ.get('SPOTIFY_SECRET')
+        self.spotify_active = False
+
+        if client_id and client_secret:
+            self.spotify_active = True
+            self.spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
 
     @commands.command(name='guildinfo', help='Shows debug info about the guild')
     async def guildinfo(self, ctx, guild: discord.Guild = None):
@@ -157,13 +168,13 @@ class Utils(commands.Cog):
         # if channel is None:
         #     self.notifier.show('Keiretsu V2', 'Please specify a channel')
         #     return
-#
+
         # with open("whitelist.txt", "a") as f:
         #     channels = f.read().splitlines()
         #     if channel.id in channels:
         #         self.notifier.show('Keiretsu V2', 'Channel is already whitelisted')
         #         return
-#
+
         #     f.write(f"{channel.id}\n")
         #     self.notifier.show('Keiretsu V2', f"Whitelisted {channel.mention}")
         await ctx.reply('This command is currently disabled')
@@ -174,20 +185,416 @@ class Utils(commands.Cog):
         # if channel is None:
         #     self.notifier.show('Keiretsu V2', 'Please specify a channel')
         #     return
-#
+
         # with open("whitelist.txt", "r") as f:
         #     channels = f.read().splitlines()
         #     if channel.id not in channels:
         #         self.notifier.show('Keiretsu V2', 'Channel is not whitelisted')
         #         return
-#
+
         # with open("whitelist.txt", "w") as f:
         #     for line in channels:
         #         if line != channel.id:
         #             f.write(f"{line}\n")
-#
+
         # self.notifier.show('Keiretsu V2', f"Unwhitelisted {channel.mention}")
         await ctx.reply('This command is currently disabled')
+
+    @commands.group(name='spotify', help='Shows information about a spotify track', invoke_without_command=True)
+    async def spotify(self, ctx):
+        await ctx.reply(f'Use `{ctx.prefix}help` for a list of commands')
+
+    @spotify.command(name='play', help='Plays a spotify track')
+    async def spotify_play(self, ctx, *, track):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=track, type='track')
+        if results['tracks']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        track = results['tracks']['items'][0]
+        await ctx.reply(f'Playing {track["name"]} by {track["artists"][0]["name"]}')
+        self.spotify.start_playback(uris=[track['uri']])
+
+    @spotify.command(name='pause', help='Pauses the current spotify track')
+    async def spotify_pause(self, ctx):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        self.spotify.pause_playback()
+        await ctx.reply('Paused playback')
+
+    @spotify.command(name='resume', help='Resumes the current spotify track')
+    async def spotify_resume(self, ctx):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        self.spotify.start_playback()
+        await ctx.reply('Resumed playback')
+
+    @spotify.command(name='next', help='Plays the next spotify track')
+    async def spotify_next(self, ctx):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        self.spotify.next_track()
+        await ctx.reply('Playing next track')
+
+    @spotify.command(name='previous', help='Plays the previous spotify track')
+    async def spotify_previous(self, ctx):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        self.spotify.previous_track()
+        await ctx.reply('Playing previous track')
+
+    @spotify.command(name='track', help='Shows information about a spotify track')
+    async def spotify_track(self, ctx, *, track):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=track, type='track')
+        if results['tracks']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        track = results['tracks']['items'][0]
+        message = f""">>> **{track['name']}**
+        **Artist:** {track['artists'][0]['name']}
+        **Album:** {track['album']['name']}
+        **Release Date:** {track['album']['release_date']}
+        **Duration:** {datetime.timedelta(milliseconds=track['duration_ms'])}
+        **Popularity:** {track['popularity']}
+        **Explicit:** {track['explicit']}
+        **URL:** {track['external_urls']['spotify']}"""
+
+        await ctx.reply(message)
+
+    @spotify.command(name='album', help='Shows information about a spotify album')
+    async def spotify_album(self, ctx, *, album):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=album, type='album')
+        if results['albums']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        album = results['albums']['items'][0]
+        message = f""">>> **{album['name']}**
+        **Artist:** {album['artists'][0]['name']}
+        **Release Date:** {album['release_date']}
+        **Tracks:** {album['total_tracks']}
+        **Popularity:** {album['popularity']}
+        **URL:** {album['external_urls']['spotify']}"""
+
+        await ctx.reply(message)
+
+    @spotify.command(name='artist', help='Shows information about a spotify artist')
+    async def spotify_artist(self, ctx, *, artist):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=artist, type='artist')
+        if results['artists']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        artist = results['artists']['items'][0]
+        message = f""">>> **{artist['name']}**
+        **Followers:** {artist['followers']['total']}
+        **Popularity:** {artist['popularity']}
+        **URL:** {artist['external_urls']['spotify']}"""
+
+        await ctx.reply(message)
+
+    @spotify.command(name='playlist', help='Shows information about a spotify playlist')
+    async def spotify_playlist(self, ctx, *, playlist):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=playlist, type='playlist')
+        if results['playlists']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        playlist = results['playlists']['items'][0]
+        message = f""">>> **{playlist['name']}**
+        **Owner:** {playlist['owner']['display_name']}
+        **Tracks:** {playlist['tracks']['total']}
+        **URL:** {playlist['external_urls']['spotify']}"""
+
+        await ctx.reply(message)
+
+    @spotify.command(name='user', help='Shows information about a spotify user')
+    async def spotify_user(self, ctx, *, user):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=user, type='user')
+        if results['users']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        user = results['users']['items'][0]
+        message = f""">>> **{user['display_name']}**
+        **Followers:** {user['followers']['total']}
+        **URL:** {user['external_urls']['spotify']}"""
+
+        await ctx.reply(message)
+
+    @spotify.command(name='search', help='Searches for a spotify track')
+    async def spotify_search(self, ctx, *, query):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=query, type='track')
+        if results['tracks']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        message = f""">>> **Search Results**
+        **Tracks:** {results['tracks']['total']}
+        **Albums:** {results['albums']['total']}
+        **Artists:** {results['artists']['total']}
+        **Playlists:** {results['playlists']['total']}
+        **Users:** {results['users']['total']}"""
+
+        await ctx.reply(message)
+
+    @spotify.command(name='top', help='Shows the top tracks of a spotify user')
+    async def spotify_top(self, ctx, *, user):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=user, type='user')
+        if results['users']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        user = results['users']['items'][0]
+        results = self.spotify.current_user_top_tracks(limit=10)
+        message = f""">>> **{user['display_name']}'s Top Tracks**
+        **Tracks:** {results['total']}\n"""
+
+        for i, track in enumerate(results['items']):
+            message += f"{i + 1}. {track['name']} - {track['artists'][0]['name']}\n"
+
+        await ctx.reply(message)
+
+    @spotify.command(name='recent', help='Shows the recent tracks of a spotify user')
+    async def spotify_recent(self, ctx, *, user):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=user, type='user')
+        if results['users']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        user = results['users']['items'][0]
+        results = self.spotify.current_user_recently_played(limit=10)
+        message = f""">>> **{user['display_name']}'s Recent Tracks**
+        **Tracks:** {results['total']}\n"""
+
+        for i, track in enumerate(results['items']):
+            message += f"{i + 1}. {track['track']['name']} - {track['track']['artists'][0]['name']}\n"
+
+        await ctx.reply(message)
+
+    @spotify.command(name='recommend', help='Recommends a spotify track')
+    async def spotify_recommend(self, ctx, *, track):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=track, type='track')
+        if results['tracks']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        track = results['tracks']['items'][0]
+        results = self.spotify.recommendations(seed_tracks=[track['id']])
+        message = f""">>> **Recommendations for {track['name']} by {track['artists'][0]['name']}**
+        **Tracks:** {len(results['tracks'])}\n"""
+
+        for i, track in enumerate(results['tracks']):
+            message += f"{i + 1}. {track['name']} - {track['artists'][0]['name']}\n"
+
+        await ctx.reply(message)
+
+    @spotify.command(name='related', help='Shows related artists to a spotify artist')
+    async def spotify_related(self, ctx, *, artist):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=artist, type='artist')
+        if results['artists']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        artist = results['artists']['items'][0]
+        results = self.spotify.artist_related_artists(artist['id'])
+        message = f""">>> **Related Artists to {artist['name']}**
+        **Artists:** {len(results['artists'])}\n"""
+
+        for i, artist in enumerate(results['artists']):
+            message += f"{i + 1}. {artist['name']}\n"
+
+        await ctx.reply(message)
+
+    @spotify.command(name='genres', help='Shows the available spotify genres')
+    async def spotify_genres(self, ctx):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.recommendation_genre_seeds()
+        message = f""">>> **Available Genres**
+        **Genres:** {len(results['genres'])}\n"""
+
+        for i, genre in enumerate(results['genres']):
+            message += f"{i + 1}. {genre}\n"
+
+        await ctx.reply(message)
+
+    @spotify.command(name='featured', help='Shows the featured spotify playlists')
+    async def spotify_featured(self, ctx):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.featured_playlists()
+        message = f""">>> **Featured Playlists**
+        **Playlists:** {results['playlists']['total']}\n"""
+
+        for i, playlist in enumerate(results['playlists']['items']):
+            message += f"{i + 1}. {playlist['name']} - {playlist['owner']['display_name']}\n"
+
+        await ctx.reply(message)
+
+    @spotify.command(name='new', help='Shows the new spotify releases')
+    async def spotify_new(self, ctx):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.new_releases()
+        message = f""">>> **New Releases**
+        **Albums:** {results['albums']['total']}\n"""
+
+        for i, album in enumerate(results['albums']['items']):
+            message += f"{i + 1}. {album['name']} - {album['artists'][0]['name']}\n"
+
+        await ctx.reply(message)
+
+    @spotify.command(name='categories', help='Shows the available spotify categories')
+    async def spotify_categories(self, ctx):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.categories()
+        message = f""">>> **Available Categories**
+        **Categories:** {results['categories']['total']}\n"""
+
+        for i, category in enumerate(results['categories']['items']):
+            message += f"{i + 1}. {category['name']}\n"
+
+        await ctx.reply(message)
+
+    @spotify.command(name='category', help='Shows the playlists of a spotify category')
+    async def spotify_category(self, ctx, *, category):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=category, type='category')
+        if results['categories']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        category = results['categories']['items'][0]
+        results = self.spotify.category_playlists(category['id'])
+        message = f""">>> **Playlists in {category['name']}**
+        **Playlists:** {results['playlists']['total']}\n"""
+
+        for i, playlist in enumerate(results['playlists']['items']):
+            message += f"{i + 1}. {playlist['name']} - {playlist['owner']['display_name']}\n"
+
+        await ctx.reply(message)
+
+    @spotify.command(name='playlist_tracks', help='Shows the tracks of a spotify playlist')
+    async def spotify_playlist_tracks(self, ctx, *, playlist):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.search(q=playlist, type='playlist')
+        if results['playlists']['total'] == 0:
+            await ctx.reply('No results found')
+            return
+
+        playlist = results['playlists']['items'][0]
+        results = self.spotify.playlist_tracks(playlist['id'])
+        message = f""">>> **Tracks in {playlist['name']}**
+        **Tracks:** {results['total']}\n"""
+
+        for i, track in enumerate(results['items']):
+            message += f"{i + 1}. {track['track']['name']} - {track['track']['artists'][0]['name']}\n"
+
+        await ctx.reply(message)
+
+    @spotify.command(name='status', help='Shows the current spotify status')
+    async def status(self, ctx):
+        if not self.spotify_active:
+            await ctx.reply('This command is currently disabled')
+            return
+
+        results = self.spotify.current_playback()
+        if results is None:
+            await ctx.reply('No results found')
+            return
+
+        progress = datetime.timedelta(milliseconds=results['progress_ms'])
+        max_progress = datetime.timedelta(milliseconds=results['item']['duration_ms'])
+        url = results['item']['external_urls']['spotify']
+        artist = results['item']['artists'][0]['name']
+        album = results['item']['album']['name']
+        name = results['item']['name']
+
+        minimum = 0
+        maximum = 10
+        progress_bar = '-' * maximum
+        prog_normalized = int((results['progress_ms'] / results['item']['duration_ms']) * maximum)
+        progress_bar = progress_bar[:prog_normalized] + '>' + progress_bar[prog_normalized + 1:]
+        if len(progress_bar) > maximum:
+            progress_bar = progress_bar[:maximum]
+
+        message = f""">>> **{name}**
+        **Artist:** {artist}
+        **Album:** {album}
+        **Progress:** {progress} / {max_progress}
+        **URL:** {url}
+        **Progress Bar:** {progress_bar}"""
+
+        await ctx.reply(message)
 
 
 async def setup(bot):
