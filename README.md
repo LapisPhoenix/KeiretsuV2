@@ -1,6 +1,6 @@
 # Keiretsu V2
 
-![Keiretsu V2 Logo](https://raw.githubusercontent.com/LapisPhoenix/KeiretsuV2/main/keiretsu_v2.png)
+![Keiretsu V2 Logo](https://raw.githubusercontent.com/LapisPhoenix/KeiretsuV2/main/assets/keiretsu_v2.png)
 
 Keiretsu V2 is a Discord self-bot designed to be an all-in-one bot for your needs.
 
