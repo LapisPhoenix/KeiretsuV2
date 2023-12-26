@@ -10,7 +10,7 @@ from colorama import init, Fore
 
 bot = commands.Bot(command_prefix='!', self_bot=True)   # ! is a placeholder, on ready it will be replaced with the prefix from config file
 bot.remove_command('help')
-bot.__version__ = '1.1.4'
+bot.__version__ = '1.2.0'
 
 
 def inital_window_setup():

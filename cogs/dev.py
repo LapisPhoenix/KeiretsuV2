@@ -1,5 +1,7 @@
 import sys
 import datetime
+import io
+import discord
 from discord.ext import commands
 
 
@@ -73,6 +75,39 @@ class Dev(commands.Cog):
         **Bot Uptime:** {uptime} ({boot_time})"""
 
         await ctx.reply(message)
+
+    @commands.command(name='help_markdown', help='Gives back the same response as help, but in markdown.')
+    async def help_markdown(self, ctx):
+        def get_command_info(command, prefix):
+            help_msg = f"{prefix}{command.name} "
+            if command.params:
+                help_msg += ' '.join(f"[{param}]" for param in command.params if param not in ('self', 'ctx'))
+            aliases = ', '.join(command.aliases) if command.aliases else 'None'
+            return f"| {command.name:<{max_name_length}} | {command.help:<{max_desc_length}} | {help_msg:<40} | {aliases} |"
+
+        def process_command(command, prefix):
+            nonlocal max_name_length, max_desc_length
+            command_message = get_command_info(command, prefix)
+            messages.append(command_message)
+            if isinstance(command, commands.Group):
+                for subcommand in command.commands:
+                    process_command(subcommand, f"{prefix}{command.name} ")
+
+        max_name_length = max(len(command.name) for command in self.bot.commands if not command.hidden)
+        max_desc_length = max(len(command.help) for command in self.bot.commands if not command.hidden)
+
+        header = "| Command" + " " * (max_name_length - 7) + "| Description" + " " * (
+                max_desc_length - 11) + "| Usage                                      | Aliases |\n"
+        header += "| " + "-" * (max_name_length + 2) + "| " + "-" * (max_desc_length + 2) + "| " + "-" * 42 + "| " + "-" * 8 + " |\n"
+        messages = []
+
+        for command in self.bot.commands:
+            if command.hidden:
+                continue
+            process_command(command, self.bot.command_prefix)
+
+        # Use join to concatenate messages with only a single newline
+        await ctx.reply(file=discord.File(fp=io.StringIO(header + '\n'.join(messages)), filename='help.md'))
 
 
 async def setup(bot):

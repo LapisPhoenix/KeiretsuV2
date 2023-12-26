@@ -63,6 +63,33 @@ class Fun(commands.Cog):
         await asyncio.sleep(0.8)
         await message.edit(content=':fire:')
 
+    @commands.command(name='mock', help='Mocks a message')
+    async def mock(self, ctx, *, message: str = None):
+        if ctx.message.reference and not message:
+            msg = await ctx.fetch_message(ctx.message.reference.message_id)
+            message = msg.content
+
+        if not message:
+            await ctx.reply('Please provide a message to mock')
+            return
+
+        cap = True
+        for i in range(len(message)):
+            if message[i].isalpha():
+                if cap:
+                    message = message[:i] + message[i].upper() + message[i + 1:]
+                else:
+                    message = message[:i] + message[i].lower() + message[i + 1:]
+                cap = not cap
+
+        await ctx.message.delete()
+
+        # Reply to the message if it was a reply
+        if ctx.message.reference:
+            await ctx.message.reference.resolved.reply(message)
+        else:
+            await ctx.reply(message)
+
 
 async def setup(bot):
     await bot.add_cog(Fun(bot))

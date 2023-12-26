@@ -22,6 +22,21 @@ class Utils(commands.Cog):
             self.spotify_active = True
             self.spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
 
+    @staticmethod
+    def split_lines(text, max_chars):
+        lines = text.split('\n')
+        result = []
+        current_line = ''
+        for line in lines:
+            if len(current_line + line) <= max_chars:
+                current_line += line + '\n'
+            else:
+                result.append(current_line.strip())
+                current_line = line + '\n'
+        if current_line:
+            result.append(current_line.strip())
+        return result
+
     @commands.command(name='guildinfo', help='Shows debug info about the guild')
     async def guildinfo(self, ctx, guild: discord.Guild = None):
         if guild is None:
@@ -130,26 +145,37 @@ class Utils(commands.Cog):
 
     @commands.command(name='help', help='Shows this message')
     async def help(self, ctx):
-        await ctx.reply("[Help Page](<https://github.com/LapisPhoenix/KeiretsuV2/wiki/Documentation>)")
+        max_name_length = max(len(command.name) for command in self.bot.commands if not command.hidden)
+        max_desc_length = max(len(command.help) for command in self.bot.commands if not command.hidden)
 
-    @commands.command(name='generate_markdown', help='Generates markdown documentation for the bot')
-    async def generate_markdown(self, ctx):
-        message = "# Keiretsu V2 Documentation\n\n"
+        header = "Command" + " " * (max_name_length - 7) + "Description" + " " * (
+                max_desc_length - 11) + "Usage    Aliases\n"
+        messages = []
+        current_message = header
+        for command in self.bot.commands:
+            if command.hidden:
+                continue
+            help_msg = f"{self.bot.command_prefix}{command.name} "
+            if command.params:
+                for param in command.params:
+                    if param == 'self' or param == 'ctx':
+                        continue
+                    help_msg += f"<{param}> "
+            aliases = ', '.join(command.aliases) if command.aliases else 'None'
+            command_message = f"{command.name:<{max_name_length}} {command.help:<{max_desc_length}} {help_msg:<20} {aliases}\n"
+            # Check if adding this command would exceed the Discord character limit
+            if len(current_message + command_message) > 1994:
+                # If it would, add the current message to the list and start a new one
+                messages.append(current_message)
+                current_message = header + command_message
+            else:
+                # If not, add the command to the current message
+                current_message += command_message
+        # Add the last message to the list
+        messages.append(current_message)
 
-        for cog in self.bot.cogs:
-            cog = self.bot.get_cog(cog)
-            message += f"## {cog.qualified_name}\n\n---\n\n"
-
-            for command in cog.get_commands():
-                message += f"### {command.name}\n"
-                message += f"**Description:** {command.help}\n <br>"
-                message += f"**Usage:** {command.usage}\n <br>"
-                message += f"**Aliases:** {command.aliases}\n"
-                message += "\n"
-
-            message += "\n---\n\n"
-
-        await ctx.reply(file=discord.File(fp=io.StringIO(message), filename='KeiretsuV2.md'))
+        for msg in messages:
+            await ctx.reply(f"```{msg}```")
 
     @commands.command(name='uptime', help='Shows the bot\'s uptime')
     async def uptime(self, ctx):
@@ -595,6 +621,33 @@ class Utils(commands.Cog):
         **Progress Bar:** {progress_bar}"""
 
         await ctx.reply(message)
+
+    @commands.command(name='loripsum', help='Generates a random lorem ipsum')
+    async def loripsum(self, ctx, sentences: int = 5, sentence_length: int = 5):
+        WORDS = ['lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'suspendisse', 'mattis',
+                 'augue', 'at', 'dui', 'interdum', 'in', 'non', 'quam', 'eleifend', 'vulputate', 'ligula', 'vel', 'a',
+                 'metus', 'urna', 'porta', 'euismod', 'eget', 'pretium', 'odio', 'morbi', 'posuere', 'sapien', 'eros',
+                 'lobortis', 'fringilla', 'magna', 'laoreet', 'duis', 'sed', 'nisl', 'scelerisque', 'tristique',
+                 'nulla', 'vestibulum', 'nibh', 'rutrum', 'ut', 'massa', 'nullam', 'vehicula', 'turpis', 'quis',
+                 'iaculis', 'cras', 'pulvinar', 'neque', 'nec', 'hendrerit', 'vitae', 'mi', 'convallis', 'et', 'justo',
+                 'tempus', 'leo', 'commodo', 'variusvestibulum', 'finibus', 'nunc', 'proin', 'venenatis', 'ultricies',
+                 'nam', 'placerat', 'mauris', 'sagittis', 'suscipit', 'lectus', 'porttitor', 'aenean', 'eu',
+                 'elementum', 'velit', 'cursus', 'id', 'donec', 'congue', 'fusce', 'felis', 'tortor', 'vivamus',
+                 'dignissim', 'malesuada', 'libero', 'risus', 'egestas', 'nisi', 'tincidunt', 'nuncsuspendisse',
+                 'potenti', 'gravida', 'dapibus', 'imperdiet', 'diam', 'tempor', 'erat', 'feugiat', 'purus', 'est',
+                 'quisque', 'faucibus', 'aliquam', 'rhoncus', 'ac', 'luctus', 'sodales', 'arcu', 'pellentesque',
+                 'dictum', 'nisiaenean', 'lacinia', 'ullamcorper', 'fermentum', 'ultrices', 'tellus', 'praesent',
+                 'facilisis', 'auctor', 'molestie', 'maecenas', 'enim', 'phasellus', 'efficitur', 'elitfusce',
+                 'volutpat', 'viverra', 'orci', 'curabitur', 'sem']
+        SYMBOLS = ['.', '!', '?']
+
+        message = ' '.join(
+            f"{' '.join(random.choice(WORDS) for _ in range(sentence_length))}{random.choice(SYMBOLS)}"
+            for _ in range(sentences)
+        ).capitalize()
+
+        await ctx.reply(file=discord.File(fp=io.StringIO(message), filename='loripsum.txt'))
+
 
 
 async def setup(bot):
