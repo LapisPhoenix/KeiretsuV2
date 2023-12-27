@@ -1,6 +1,11 @@
 # Keiretsu V2
 
-![Keiretsu V2 Logo](https://raw.githubusercontent.com/LapisPhoenix/KeiretsuV2/main/keiretsu_v2.png)
+![Keiretsu V2 Logo](https://raw.githubusercontent.com/LapisPhoenix/KeiretsuV2/main/assets/keiretsu_v2.png)
+
+
+![Python Version](https://img.shields.io/badge/Python-3.12-yellow?logo=python&logoColor=white) ![Windows Supported True](https://img.shields.io/badge/Windows-Supported-green?logo=windows10) ![Linux Supported True](https://img.shields.io/badge/Linux-Supported-green?logo=linux?logoColor=white) ![MacOS Supported True](https://img.shields.io/badge/MacOS-Not_Supported-red?logo=apple?logoColor=white) ![License](https://img.shields.io/github/license/LapisPhoenix/KeiretsuV2?color=blue)
+
+
 
 Keiretsu V2 is a Discord self-bot designed to be an all-in-one bot for your needs.
 
