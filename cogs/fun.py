@@ -326,7 +326,30 @@ class Fun(commands.Cog):
         else:
             await ctx.reply(text)
 
+    @commands.command(name='0=1', help='Proves 0=1')
+    async def zero_equals_one(self, ctx):
+        await ctx.reply(""" # Why 1 = 2 and 0 = 1.
 
+In math, there are many rules, but 1 rule particularly is important. You cannot divide by 0. Why? We are always told that dividing by 0 is impossible, and even our calculators error when we try to do this supposedly impossible feat. But what if it's its not?
+
+Normally, when you divide smaller numbers the outcome is bigger, and vise versa, example:
+
+```10 ÷ 2 = 5
+10 ÷ 1/2 = 20
+10 ÷ 1/4 = 40
+10 ÷ 0.1 = 100```
+
+So on, you'd think if you keep dividing by smaller and smaller numbers you'll reach infinity, right? 10/x = y.
+Using this assumption, then 10 ÷ 0 = ∞. But this is an assumption, by thinking about it further, all we know is that if we divide 10 by a number that tends towards 0, then we get an answer that tends towards infinity. But this does not mean 10 divided by 0 is equal to infinity. Confused yet?
+
+What is division exactly? For example 10 ÷ 2 could mean "*how many times do I need to add 2 to make 10, or 2 times what makes 10*". Dividing be a number is the reverse of multiplication. If we multiply any number, y, by a given number, x, can we multiple x with another number to get back to y, we will call the result z. y(x) = z(?) = y. For example, if we preform this 3(2) we get 6, then you can multiply by 1/2 to get back to 3.  Thus the multiplicative inverse of 2 is 1/2, and the multiplicative of 10 is 1/10. Notice, if we multiply these multiplicative numbers together we always get 1. Try this yourself, do 2(1/2) or 10(1/10). It always equals 1.
+
+If we want to divide 0 we need to find its multiplicative inverse, which should be 1/0.  0(1/2) = 1? Well no. Anything multiplied by 0 is still 0, 
+1(0) = 0 or 7(0) = 0 for example. Finding the multiplicative inverse is impossible. Zero has no multiplicative inverse. 
+
+Lets say ∞ = 1/0, based on the definition of a multiplicative inverse previously stated, 0(∞) = 1. That means 0(∞) + 0(∞) = 2, simplify, 0(∞) = 2! If 0(∞) = 1 is true, and 0(∞) = 2 is true, then
+
+# 1 = 2, thus 0 = 1""")
 
 
 async def setup(bot):

@@ -710,6 +710,83 @@ class Utils(commands.Cog):
         except RegexMatchError:
             await ctx.reply('Invalid URL')
 
+    @commands.group(name='codeblock', help='Sends a codeblock with the given language', invoke_without_command=True)
+    async def codeblock(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.reply('Invalid subcommand passed')
+
+    @codeblock.command(name='python', help='Sends a codeblock with the python language')
+    async def python(self, ctx, *, code):
+        await ctx.reply(f'```python\n{code}```')
+
+    @codeblock.command(name='js', help='Sends a codeblock with the javascript language')
+    async def js(self, ctx, *, code):
+        await ctx.reply(f'```js\n{code}```')
+
+    @codeblock.command(name='c', help='Sends a codeblock with the c language')
+    async def c(self, ctx, *, code):
+        await ctx.reply(f'```c\n{code}```')
+
+    @codeblock.command(name='cpp', help='Sends a codeblock with the cpp language')
+    async def cpp(self, ctx, *, code):
+        await ctx.reply(f'```cpp\n{code}```')
+
+    @codeblock.command(name='csharp', help='Sends a codeblock with the csharp language')
+    async def csharp(self, ctx, *, code):
+        await ctx.reply(f'```csharp\n{code}```')
+
+    @codeblock.command(name='css', help='Sends a codeblock with the css language')
+    async def css(self, ctx, *, code):
+        await ctx.reply(f'```css\n{code}```')
+
+    @codeblock.command(name='html', help='Sends a codeblock with the html language')
+    async def html(self, ctx, *, code):
+        await ctx.reply(f'```html\n{code}```')
+
+    @codeblock.command(name='java', help='Sends a codeblock with the java language')
+    async def java(self, ctx, *, code):
+        await ctx.reply(f'```java\n{code}```')
+
+    @codeblock.command(name='php', help='Sends a codeblock with the php language')
+    async def php(self, ctx, *, code):
+        await ctx.reply(f'```php\n{code}```')
+
+    @codeblock.command(name='ruby', help='Sends a codeblock with the ruby language')
+    async def ruby(self, ctx, *, code):
+        await ctx.reply(f'```ruby\n{code}```')
+
+    @codeblock.command(name='rust', help='Sends a codeblock with the rust language')
+    async def rust(self, ctx, *, code):
+        await ctx.reply(f'```rust\n{code}```')
+
+    @codeblock.command(name='sql', help='Sends a codeblock with the sql language')
+    async def sql(self, ctx, *, code):
+        await ctx.reply(f'```sql\n{code}```')
+
+    @codeblock.command(name='swift', help='Sends a codeblock with the swift language')
+    async def swift(self, ctx, *, code):
+        await ctx.reply(f'```swift\n{code}```')
+
+    @codeblock.command(name='typescript', help='Sends a codeblock with the typescript language')
+    async def typescript(self, ctx, *, code):
+        await ctx.reply(f'```typescript\n{code}```')
+
+    @codeblock.command(name='vb', help='Sends a codeblock with the vb language')
+    async def vb(self, ctx, *, code):
+        await ctx.reply(f'```vb\n{code}```')
+
+    @codeblock.command(name='xml', help='Sends a codeblock with the xml language')
+    async def xml(self, ctx, *, code):
+        await ctx.reply(f'```xml\n{code}```')
+
+    @codeblock.command(name='yaml', help='Sends a codeblock with the yaml language')
+    async def yaml(self, ctx, *, code):
+        await ctx.reply(f'```yaml\n{code}```')
+
+    @commands.command(name='code', help='Sends a codeblock with the given language')
+    async def code(self, ctx, language: str, *, code):
+        await ctx.reply(f'```{language}\n{code}```')
+
 
 async def setup(bot):
     await bot.add_cog(Utils(bot))
