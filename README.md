@@ -126,6 +126,5 @@ This project is licensed under the MIT License.
 | load            | Loads a cog                                            | !load [cog]                             | None    |
 | unhexify        | Converts hex to text                                   | !unhexify [message]                     | None    |
 | loripsum        | Generates a random lorem ipsum                         | !loripsum [sentences] [sentence_length] | None    |
-=======
 | unload          | Unloads a cog                                          | !unload [cog]                           | None    |
 | charspoil       | Spoils a message character by character                | !charspoil [message]                    | None    |
