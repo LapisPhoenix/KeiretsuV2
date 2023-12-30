@@ -1,6 +1,7 @@
 # Keiretsu V2
 
 ![Keiretsu V2 Logo](https://raw.githubusercontent.com/LapisPhoenix/KeiretsuV2/main/assets/keiretsu_v2.png)
+
 ![Python Version](https://img.shields.io/badge/Python-3.12-yellow?logo=python&logoColor=white) ![Windows Supported True](https://img.shields.io/badge/Windows-Supported-green?logo=windows10) ![Linux Supported True](https://img.shields.io/badge/Linux-Supported-green?logo=linux?logoColor=white) ![MacOS Supported True](https://img.shields.io/badge/MacOS-Not_Supported-red?logo=apple?logoColor=white) ![License](https://img.shields.io/github/license/LapisPhoenix/KeiretsuV2?color=blue)
 
 
@@ -104,7 +105,7 @@ This project is licensed under the MIT License.
 | artist          | Shows information about a spotify artist               | !spotify artist [artist]                | None    |
 | playlist        | Shows information about a spotify playlist             | !spotify playlist [playlist]            | None    |
 | user            | Shows information about a spotify user                 | !spotify user [user]                    | None    |
-| search          | Searches for a spotify track                           | !spotify search [query]                 | None    |
+| search          | Searches for a spotify track                           | !spotify search [query]                 | None    | 
 | top             | Shows the top tracks of a spotify user                 | !spotify top [user]                     | None    |
 | recent          | Shows the recent tracks of a spotify user              | !spotify recent [user]                  | None    |
 | recommend       | Recommends a spotify track                             | !spotify recommend [track]              | None    |
@@ -125,3 +126,6 @@ This project is licensed under the MIT License.
 | load            | Loads a cog                                            | !load [cog]                             | None    |
 | unhexify        | Converts hex to text                                   | !unhexify [message]                     | None    |
 | loripsum        | Generates a random lorem ipsum                         | !loripsum [sentences] [sentence_length] | None    |
+=======
+| unload          | Unloads a cog                                          | !unload [cog]                           | None    |
+| charspoil       | Spoils a message character by character                | !charspoil [message]                    | None    |
