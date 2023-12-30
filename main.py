@@ -1,11 +1,10 @@
 import os
 import sys
-import logging
+import argparse
 import datetime
 from pathlib import Path
 from discord.ext import commands
 from dotenv import load_dotenv
-from pystyle import Colors, Colorate
 from colorama import init, Fore
 
 
@@ -48,7 +47,7 @@ async def on_ready():
     inital_window_setup()
     await load_cogs()
 
-    print(Colorate.Vertical(Colors.blue_to_green, """@@@@                 @@@@
+    print(f"""{Fore.LIGHTGREEN_EX}@@@@                 @@@@
 @@@@               @@@@@@
 @@@@              @@@@@  
 @@@@            @@@@@    
@@ -67,7 +66,7 @@ async def on_ready():
 @@@@             @@@@@   
 @@@@              @@@@@  
 @@@@                @@@@@
-@@@@                 @@@@"""))
+@@@@                 @@@@{Fore.RESET}""")
     prefix = os.environ.get('PREFIX')
     bot.command_prefix = prefix
     bot.boot_time = datetime.datetime.now()
@@ -77,11 +76,24 @@ async def on_ready():
     print(f'Prefix: {Fore.GREEN}{prefix}{Fore.RESET}')
 
 
-if __name__ == '__main__':
-    load_dotenv()
+def boot_up():
     print('Booting Up...')
     print('Reminder: You may be prompted to login your spotify account, this is normal')
     if os.environ.get('DEV') == 'true':
         print('Running in development mode')
         bot.run(os.environ.get('TOKEN'))
     bot.run(os.environ.get('TOKEN'), log_level=0)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Keiretsu V2 - A Discord Selfbot.')
+    parser.add_argument('-e', '--env', help='Path to .env file', default='.env')
+    args = parser.parse_args()
+    env_path = Path(args.env)
+
+    if not env_path.exists():
+        print(f'No .env file found at {env_path}')
+        sys.exit(1)
+
+    load_dotenv(dotenv_path=env_path)
+    boot_up()

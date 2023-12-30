@@ -1,10 +1,12 @@
 import io
 import random
 import os
+import json
 import discord
 import datetime
 import pyshorteners
 import spotipy
+import asyncio
 from discord.ext import commands
 from spotipy.oauth2 import SpotifyClientCredentials
 from pytube import YouTube
@@ -189,44 +191,6 @@ class Utils(commands.Cog):
     @commands.command(name='download', help='Links to the github repo')
     async def download(self, ctx):
         await ctx.reply('https://github.com/LapisPhoenix/KeiretsuV2')
-
-    @commands.command(name='watch', help='Whitelists a channel for logging')
-    async def watch(self, ctx, channel: discord.TextChannel = None):
-        # await ctx.message.delete()
-        # if channel is None:
-        #     self.notifier.show('Keiretsu V2', 'Please specify a channel')
-        #     return
-
-        # with open("whitelist.txt", "a") as f:
-        #     channels = f.read().splitlines()
-        #     if channel.id in channels:
-        #         self.notifier.show('Keiretsu V2', 'Channel is already whitelisted')
-        #         return
-
-        #     f.write(f"{channel.id}\n")
-        #     self.notifier.show('Keiretsu V2', f"Whitelisted {channel.mention}")
-        await ctx.reply('This command is currently disabled')
-
-    @commands.command(name='unwatch', help='Unwhitelists a channel for logging')
-    async def unwatch(self, ctx, channel: discord.TextChannel = None):
-        # await ctx.message.delete()
-        # if channel is None:
-        #     self.notifier.show('Keiretsu V2', 'Please specify a channel')
-        #     return
-
-        # with open("whitelist.txt", "r") as f:
-        #     channels = f.read().splitlines()
-        #     if channel.id not in channels:
-        #         self.notifier.show('Keiretsu V2', 'Channel is not whitelisted')
-        #         return
-
-        # with open("whitelist.txt", "w") as f:
-        #     for line in channels:
-        #         if line != channel.id:
-        #             f.write(f"{line}\n")
-
-        # self.notifier.show('Keiretsu V2', f"Unwhitelisted {channel.mention}")
-        await ctx.reply('This command is currently disabled')
 
     @commands.group(name='spotify', help='Shows information about a spotify track', invoke_without_command=True)
     async def spotify(self, ctx):

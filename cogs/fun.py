@@ -1,5 +1,7 @@
 import random
+import io
 import asyncio
+import discord
 from discord.ext import commands
 
 
@@ -350,6 +352,17 @@ If we want to divide 0 we need to find its multiplicative inverse, which should 
 Lets say ∞ = 1/0, based on the definition of a multiplicative inverse previously stated, 0(∞) = 1. That means 0(∞) + 0(∞) = 2, simplify, 0(∞) = 2! If 0(∞) = 1 is true, and 0(∞) = 2 is true, then
 
 # 1 = 2, thus 0 = 1""")
+
+    @commands.command(name='pi', help='Gives back pi to the nth digit')
+    async def pi(self, ctx, digits: int = 100):
+        if digits > 1_000_001:
+            await ctx.reply('Please provide a within 1,000,000 digits')
+            return
+
+        with open('assets/commands/pi.txt', 'r') as f:
+            pi = f.read()
+
+        await ctx.reply(file=discord.File(fp=io.StringIO(pi[:digits]), filename='pi.txt'))
 
 
 async def setup(bot):

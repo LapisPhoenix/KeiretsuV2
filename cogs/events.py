@@ -1,4 +1,3 @@
-import os
 import difflib
 import random
 import re
@@ -14,8 +13,6 @@ class Events(commands.Cog):
         self.bot: commands.Bot = bot
         self.regex = re.compile(r'(discord.com/gifts/|discordapp.com/gifts/|discord.gift/)([a-zA-Z0-9]+)')
         self.notifier = notifications.Notifications()
-        self.log_channel_id = int(os.environ.get('LOG_CHANNEL'))
-        self.log_channel = self.bot.get_channel(self.log_channel_id)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -68,7 +65,7 @@ class Events(commands.Cog):
                 print(f'[{Fore.RED}GIVEAWAY SNIPER{Fore.RESET}] Failed to react to giveaway ({e})')
 
     @commands.Cog.listener()
-    async def on_message_edit(self, before, after):
+    async def on_message_edit(self, _, after):
         if self.regex.search(after.content):
             code = self.regex.search(after.content).group(2)
             if len(code) != 16 and len(code) != 24:
@@ -90,28 +87,6 @@ class Events(commands.Cog):
                             self.notifier.show('Nitro Sniper', f'Failed to redeem nitro code: {code}')
             except Exception as e:
                 print(f'[{Fore.RED}NITRO SNIPER{Fore.RESET}] Failed to redeem nitro code: {code} ({e})')
-
-        with open("channels.txt", "r") as f:
-            channels = f.read().splitlines()
-            if after.channel.id in channels:
-                message = f"Message edited in {after.channel.id} ({after.channel.name})\n" \
-                          f"Before: `{before.content}`\n" \
-                          f"After: `{after.content}`\n" \
-                          f"Author: {after.author.id} ({after.author.name})\n\n"
-                with open("logs.txt", "a") as f:
-                    f.write(message)
-
-    @commands.Cog.listener()
-    async def on_message_delete(self, message):
-        with open("channels.txt", "r") as f:
-            channels = f.read().splitlines()
-            if message.channel.id in channels:
-                message = f"Message deleted in {message.channel.id} ({message.channel.name})\n" \
-                          f"Content: `{message.content}`\n" \
-                          f"Author: {message.author.id} ({message.author.name})\n\n"
-
-                with open("logs.txt", "a") as f:
-                    f.write(message)
 
 
 async def setup(bot):
